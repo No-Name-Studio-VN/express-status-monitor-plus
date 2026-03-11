@@ -3,12 +3,12 @@ const sinon = require('sinon');
 
 chai.should();
 
-const expresStatusMonitor = require('../src/middleware-wrapper');
+const expressStatusMonitor = require('../src/middleware-wrapper');
 const defaultConfig = require('../src/helpers/default-config');
 
 describe('middleware-wrapper', () => {
   describe('when initialised', () => {
-    const middleware = expresStatusMonitor();
+    const middleware = expressStatusMonitor();
 
     it('then it should be an instance of a Function', () => {
       middleware.should.be.an.instanceof(Function);
@@ -42,7 +42,7 @@ describe('middleware-wrapper', () => {
       });
 
       it('and res.removeHeader is present, then header is removed', (done) => {
-        const middlewareWithConfig = expresStatusMonitor({
+        const middlewareWithConfig = expressStatusMonitor({
           iframe: true,
         });
         const resWithHeaders = Object.assign({}, res);

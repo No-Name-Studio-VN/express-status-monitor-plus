@@ -18,27 +18,58 @@ const middlewareWrapper = config => {
     }, [])
     .join(' ');
 
-  const getStyleSheets = () => {
-    return fs.readFileSync(path.join(__dirname, '/public/stylesheets/', validatedConfig.theme));
+  // Read bundled assets — prefer dist/ (production), fallback to src/ (dev)
+  const distDir = path.join(__dirname, '..', 'dist');
+  const srcDir = path.join(__dirname, 'public');
+
+  const getStyleSheet = () => {
+    try {
+      return fs.readFileSync(path.join(distDir, 'styles.min.css'), 'utf8');
+    } catch {
+      return fs.readFileSync(path.join(srcDir, 'stylesheets/styles.css'), 'utf8');
+    }
   };
 
   const getScript = () => {
-    return fs.readFileSync(path.join(__dirname, `/public/javascripts/app${validatedConfig.optimize ? '.min' : ''}.js`));
+    try {
+      return fs.readFileSync(path.join(distDir, 'app.min.js'), 'utf8');
+    } catch {
+      return fs.readFileSync(path.join(srcDir, 'javascripts/app.js'), 'utf8');
+    }
   };
+
+  const getTemplate = () => {
+    try {
+      return fs.readFileSync(path.join(distDir, 'index.html'), 'utf8');
+    } catch {
+      return fs.readFileSync(path.join(srcDir, 'index.html'), 'utf8');
+    }
+  };
+
+  // Register Handlebars helper for health check rendering
+  Handlebars.registerHelper('healthCheckList', function (checks) {
+    if (!checks || checks.length === 0) return '';
+    return new Handlebars.SafeString(
+      checks.map(check => `
+        <div class="health-check-item">
+          <span class="health-check-path">${Handlebars.escapeExpression(check.path)}</span>
+          <span class="health-check-badge health-check-${Handlebars.escapeExpression(check.bg)}">${Handlebars.escapeExpression(check.status)}${check.responseTime ? ' (' + check.responseTime + 'ms)' : ''}</span>
+        </div>
+      `).join('')
+    );
+  });
 
   const data = {
     title: validatedConfig.title,
     port: validatedConfig.port,
     socketPath: validatedConfig.socketPath,
     bodyClasses,
-    backgroundImage: validatedConfig.backgroundImage,
+    darkMode: validatedConfig.darkMode,
     script: getScript(),
-    style: getStyleSheets(),
+    style: getStyleSheet(),
   };
 
-  const htmlTmpl = fs
-    .readFileSync(path.join(__dirname, '/public/index.html'))
-    .toString();
+  const htmlTmpl = getTemplate();
 
   const render = Handlebars.compile(htmlTmpl);
 

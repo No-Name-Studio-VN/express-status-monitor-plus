@@ -1,23 +1,10 @@
 'use strict';
 
-const axios = require('axios');
-
-function allSettled (promises) {
-  const wrappedPromises = promises.map(p => Promise.resolve(p)
-    .then(
-      val => ({ state: 'fulfilled', value: val }),
-      err => ({ state: 'rejected', reason: err })
-    )
-  );
-
-  return Promise.all(wrappedPromises);
-}
-
-
 module.exports = async healthChecks => {
-  const checkPromises = [];
+  const checks = healthChecks || [];
+  if (checks.length === 0) return [];
 
-  (healthChecks || []).forEach(healthCheck => {
+  const checkPromises = checks.map(async (healthCheck, index) => {
     let uri = `${healthCheck.protocol}://${healthCheck.host}`;
 
     if (healthCheck.port) {
@@ -26,31 +13,38 @@ module.exports = async healthChecks => {
 
     uri += healthCheck.path;
 
-    checkPromises.push(axios({
-      url: uri,
-      method: 'GET'
-    }));
+    const start = Date.now();
+    try {
+      const response = await fetch(uri, {
+        method: 'GET',
+        signal: AbortSignal.timeout(5000),
+      });
+
+      return {
+        path: healthCheck.path,
+        status: response.ok ? 'ok' : 'failed',
+        statusCode: response.status,
+        responseTime: Date.now() - start,
+        bg: response.ok ? 'success' : 'danger',
+      };
+    } catch {
+      return {
+        path: healthCheck.path,
+        status: 'failed',
+        statusCode: 0,
+        responseTime: Date.now() - start,
+        bg: 'danger',
+      };
+    }
   });
 
-  const checkResults = [];
-
-  return allSettled(checkPromises).then(results => {
-    results.forEach((result, index) => {
-      if (result.state === 'rejected') {
-        checkResults.push({
-          path: healthChecks[index].path,
-          status: 'failed',
-          bg: 'danger'
-        });
-      } else {
-        checkResults.push({
-          path: healthChecks[index].path,
-          status: 'ok',
-          bg: 'success'
-        });
-      }
-    });
-
-    return checkResults;
-  });
+  return Promise.allSettled(checkPromises).then(results =>
+    results.map(r => r.status === 'fulfilled' ? r.value : {
+      path: 'unknown',
+      status: 'failed',
+      statusCode: 0,
+      responseTime: 0,
+      bg: 'danger',
+    })
+  );
 };

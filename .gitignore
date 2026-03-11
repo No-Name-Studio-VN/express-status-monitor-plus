@@ -1,4 +1,5 @@
 index.rendered.html
 node_modules
 coverage
+dist
 *.log

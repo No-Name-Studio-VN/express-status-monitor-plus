@@ -10,6 +10,18 @@ module.exports = (statusCode, startTime, spans) => {
       last[category] += 1;
       last.count += 1;
       last.mean += (responseTime - last.mean) / last.count;
+
+      // Track percentiles using online reservoir
+      if (!last.responseTimes) last.responseTimes = [];
+      if (last.responseTimes.length < 1000) {
+        last.responseTimes.push(responseTime);
+      } else {
+        // Reservoir sampling for memory efficiency
+        const idx = Math.floor(Math.random() * (last.count + 1));
+        if (idx < 1000) {
+          last.responseTimes[idx] = responseTime;
+        }
+      }
     } else {
       span.responses.push({
         2: category === 2 ? 1 : 0,
@@ -19,6 +31,7 @@ module.exports = (statusCode, startTime, spans) => {
         count: 1,
         mean: responseTime,
         timestamp: Date.now(),
+        responseTimes: [responseTime],
       });
     }
   });
