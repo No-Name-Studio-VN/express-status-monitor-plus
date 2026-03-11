@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   release:
@@ -35,3 +36,20 @@ jobs:
         with:
           generate_release_notes: true
           body_path: release_notes.txt
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish
+        run: |
+          npm publish --access public
+          npm deprecate express-status-monitor-plus@"< ${{ github.event.release.tag_name }}" "This version is deprecated, please upgrade to the latest version."
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          NPM_CONFIG_PROVENANCE: true
