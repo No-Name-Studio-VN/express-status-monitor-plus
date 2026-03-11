@@ -1,7 +1,5 @@
 module.exports = {
   title: 'Express Status Monitor',
-  theme: 'default.css',
-  backgroundImage: 'https://cdn.nnsvn.me/botapp/img/bg/bg.jpg',
   path: '/status',
   socketPath: '/socket.io',
   spans: [
@@ -21,6 +19,7 @@ module.exports = {
   port: null,
   websocket: null,
   iframe: false,
+  darkMode: 'auto', // 'auto' | 'dark' | 'light'
   chartVisibility: {
     cpu: true,
     mem: true,
@@ -33,5 +32,6 @@ module.exports = {
   },
   ignoreStartsWith: '/admin',
   healthChecks: [],
-  optimize: true,
+  dataDir: null, // Directory for persistent metrics (default: os.tmpdir()/express-status-monitor)
+  flushInterval: 30, // Seconds between disk flushes
 };

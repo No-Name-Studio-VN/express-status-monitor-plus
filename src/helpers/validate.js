@@ -16,8 +16,6 @@ module.exports = config => {
 
   config.title =
     typeof config.title === 'string' ? config.title : defaultConfig.title;
-  config.theme =
-    typeof config.theme === 'string' ? config.theme : defaultConfig.theme;
   config.path =
     typeof config.path === 'string' ? config.path : defaultConfig.path;
   config.socketPath =
@@ -32,6 +30,10 @@ module.exports = config => {
       : defaultConfig.websocket;
   config.iframe =
     typeof config.iframe === 'boolean' ? config.iframe : defaultConfig.iframe;
+  config.darkMode =
+    typeof config.darkMode === 'string' && ['auto', 'dark', 'light'].includes(config.darkMode)
+      ? config.darkMode
+      : defaultConfig.darkMode;
   config.chartVisibility =
     typeof config.chartVisibility === 'object'
       ? mungeChartVisibility(config.chartVisibility)
@@ -46,10 +48,15 @@ module.exports = config => {
       ? config.healthChecks
       : defaultConfig.healthChecks;
 
-  config.optimize =
-    typeof config.optimize === 'boolean'
-      ? config.optimize
-      : defaultConfig.optimize;
+  config.dataDir =
+    typeof config.dataDir === 'string'
+      ? config.dataDir
+      : defaultConfig.dataDir;
+
+  config.flushInterval =
+    typeof config.flushInterval === 'number' && config.flushInterval > 0
+      ? config.flushInterval
+      : defaultConfig.flushInterval;
 
   return config;
 };

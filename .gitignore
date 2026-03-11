@@ -1,4 +1,7 @@
 index.rendered.html
 node_modules
 coverage
+dist
 *.log
+*.env
+.DS_Store

@@ -3,152 +3,255 @@
  <h1>
   Express Status Monitor Plus
  </h1>
+ <p>
+  Real-time server monitoring dashboard for Express.js&nbsp;—&nbsp;zero-config, self-hosted, production-ready.
+ </p>
  <br />
  <p>
-  <a href="https://discord.gg/nCQbSag"><img src="https://img.shields.io/discord/425670185089892362?color=5865F2&logo=discord&logoColor=white" alt="Discord server" /></a>
-  <a href="https://www.npmjs.com/package/express-status-monitor-plus"><img src="https://img.shields.io/npm/v/express-status-monitor-plus.svg?maxAge=3600" alt="npm version" /></a>
-  <a href="https://www.npmjs.com/package/express-status-monitor-plus"><img src="https://img.shields.io/npm/dt/express-status-monitor-plus.svg?maxAge=3600" alt="npm downloads" /></a>
-  <a href="https://github.com/manhbi18112005/express-status-monitor-plus/actions/workflows/npm-publish.yml"><img src="https://github.com/manhbi18112005/express-status-monitor-plus/actions/workflows/npm-publish.yml/badge.svg" alt="Tests status" /></a>
- </p>
- <p>
-  <a href="https://www.cloudflare.com"><img src="https://raw.githubusercontent.com/discordjs/discord.js/main/.github/powered-by-workers.png" alt="Cloudflare Workers" height="44"></a>
+  <a href="https://www.npmjs.com/package/express-status-monitor-plus"><img src="https://img.shields.io/npm/v/express-status-monitor-plus.svg?style=flat-square&color=007aff" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/express-status-monitor-plus"><img src="https://img.shields.io/npm/dm/express-status-monitor-plus.svg?style=flat-square&color=30d158" alt="npm downloads" /></a>
+  <a href="https://github.com/manhbi18112005/express-status-monitor-plus/actions/workflows/npm-publish.yml"><img src="https://img.shields.io/github/actions/workflow/status/manhbi18112005/express-status-monitor-plus/npm-publish.yml?style=flat-square&label=CI" alt="CI status" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="MIT License" /></a>
+  <a href="https://discord.gg/nCQbSag"><img src="https://img.shields.io/discord/425670185089892362?style=flat-square&color=5865F2&logo=discord&logoColor=white&label=discord" alt="Discord" /></a>
  </p>
 </div>
 
-> [!IMPORTANT]
-> Starting with version 2.0.0, **express-status-monitor-plus** will operate as an independent fork of **express-status-monitor**, given that the original project is no longer maintained. This fork will continue to evolve, with direct updates and maintenance applied to the codebase, ensuring a commitment to new features and timely bug fixes. This allows the project to progress without impacting the original repository, providing users with an actively supported monitoring tool.
+<br />
 
-A simple, self-hosted module leveraging Socket.io and Chart.js to provide real-time server metrics for Express-based Node.js servers. This version is forked and customized by **MyT** to deliver enhanced functionality and maintain ongoing support.
+> **Note:** Starting with v2.0, this project will be operating as an independent fork of the original [express-status-monitor](https://github.com/RafalWilinski/express-status-monitor).
 
-![Monitoring Page](./showcases/thumbnail.gif "Monitoring Page")
+![Dashboard Preview](./assets/showcase.gif)
 
-## Support for other Node.js frameworks
+## ✨ Features
 
-* [koa-monitor](https://github.com/capaj/koa-monitor) for Koa
-* [hapijs-status-monitor](https://github.com/ziyasal/hapijs-status-monitor) for hapi.js
+- **Real-time monitoring** — CPU, memory, heap, load average, event loop latency, response times, requests/sec, and HTTP status codes
+- **Persistent storage** — Metrics survive process restarts via a file-based ring buffer (inspired by RRDtool)
+- **Response time percentiles** — P50, P95, P99 tracking with reservoir sampling
+- **Health checks** — Monitor upstream service availability with configurable endpoints
+- **Apple-inspired UI** — Dark/light/system themes, glassmorphism header, per-metric accent colors, smooth animations
+- **Chart toolbars** — Zoom in/out, reset zoom, and download chart as PNG
+- **Zero CDN dependencies** — All assets bundled with Rollup (Chart.js, Socket.io client, CSS)
+- **Lightweight** — Single middleware, ~200 KB bundled, minimal runtime overhead
+- **Tree-shaken** — Only imports the Chart.js components actually used
 
-## Installation & setup
+## 📦 Installation
 
-1. Run `npm install express-status-monitor-plus`
-2. Before any other middleware or router add following line:
-`app.use(require('express-status-monitor-plus')());`
-3. Run server and go to `/status`
-
-Note: This plugin works on Node versions > 8.x
-
-## Run examples
-
-1. Run `npm run dev`
-2. Go to `http://localhost:3000`
-
-## Options
-
-Monitor can be configured by passing options object into `expressMonitor` constructor.
-
-Default config:
-
-```javascript
-title: 'Express Status Monitor',
-theme: 'default.css',
-backgroundImage: 'https://cdn.nnsvn.me/botapp/img/bg/bg.jpg',
-path: '/status',
-socketPath: '/socket.io',
-spans: [
-  {
-    interval: 1,
-    retention: 60,
-  },
-  {
-    interval: 5,
-    retention: 60,
-  },
-  {
-    interval: 15,
-    retention: 60,
-  },
-],
-port: null,
-websocket: null, // pass your own socket.io instance; if not passed, one will be created
-iframe: false, // display standalone page at /status or inside an iframe
-chartVisibility: {
-  cpu: true,
-  mem: true,
-  load: true,
-  heap: true,
-  eventLoop: true,
-  responseTime: true,
-  rps: true,
-  statusCodes: true,
-},
-ignoreStartsWith: '/admin',
-healthChecks: [],
-optimize: true // this use a minified version of page, but it is harder to debug  
+```bash
+npm install express-status-monitor-plus
 ```
 
-## Health Checks
+**Requirements:** Node.js ≥ 18
 
-You can add a series of health checks to the configuration that will appear below the other stats. The health check will be considered successful if the endpoint returns a 200 status code.
+## 🚀 Quick Start
 
 ```javascript
-// config
-healthChecks: [{
-  protocol: 'http',
-  host: 'localhost',
-  path: '/admin/health/ex1',
-  port: '3000'
-}, {
-  protocol: 'http',
-  host: 'localhost',
-  path: '/admin/health/ex2',
-  port: '3000'
-}]
+const express = require('express');
+const statusMonitor = require('express-status-monitor-plus');
+
+const app = express();
+
+// Add as the FIRST middleware, before any routes
+app.use(statusMonitor());
+
+app.get('/', (req, res) => res.send('Hello World'));
+
+app.listen(3000, () => {
+  console.log('Server running on http://localhost:3000');
+  console.log('Dashboard at http://localhost:3000/status');
+});
 ```
 
-## Securing endpoint
+Open **http://localhost:3000/status** to view the dashboard.
 
-The HTML page handler is exposed as a `pageRoute` property on the main
-middleware function.  So the middleware is mounted to intercept all requests
-while the HTML page handler will be authenticated.
+## ⚙️ Configuration
 
-Example using <https://www.npmjs.com/package/connect-ensure-login>
+Pass an options object to customize behavior:
 
 ```javascript
-const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
+app.use(statusMonitor({
+  title: 'Express Status Monitor',   // Dashboard page title
+  path: '/status',                    // Dashboard URL path
+  socketPath: '/socket.io',          // Socket.io endpoint path
 
-const statusMonitor = require('express-status-monitor')();
+  // Data collection spans (interval in seconds, retention in data points)
+  spans: [
+    { interval: 1,  retention: 60 },  // 1 point/sec,  keep 60 points (1 min)
+    { interval: 5,  retention: 60 },  // 1 point/5sec, keep 60 points (5 min)
+    { interval: 15, retention: 60 },  // 1 point/15sec, keep 60 points (15 min)
+  ],
+
+  // Persistent storage
+  dataDir: null,                      // Metrics directory (default: os.tmpdir()/express-status-monitor)
+  flushInterval: 30,                  // Seconds between disk writes (default: 30)
+
+  // Appearance
+  darkMode: 'auto',                   // 'auto' | 'dark' | 'light'
+
+  // Chart visibility
+  chartVisibility: {
+    cpu: true,
+    mem: true,
+    load: true,
+    heap: true,
+    eventLoop: true,
+    responseTime: true,
+    rps: true,
+    statusCodes: true,
+  },
+
+  // Networking
+  port: null,                         // Custom port for Socket.io (null = use Express server)
+  websocket: null,                    // Pass your own Socket.io instance
+  iframe: false,                      // Allow embedding in iframes
+
+  // Filtering
+  ignoreStartsWith: '/admin',         // Ignore routes starting with this prefix
+
+  // Health checks (see below)
+  healthChecks: [],
+}));
+```
+
+## 🏥 Health Checks
+
+Add HTTP health check endpoints that are displayed at the bottom of the dashboard:
+
+```javascript
+app.use(statusMonitor({
+  healthChecks: [
+    {
+      protocol: 'http',
+      host: 'localhost',
+      path: '/api/health',
+      port: '3000',
+    },
+    {
+      protocol: 'https',
+      host: 'api.example.com',
+      path: '/ping',
+      port: '443',
+    },
+  ],
+}));
+```
+
+Each endpoint is polled periodically. A `200` status code is considered **OK**, anything else is marked as **FAILED**.
+
+## 💾 Persistent Metrics
+
+By default, metrics are stored on disk so they survive process restarts. The storage engine uses a **fixed-size ring buffer** (inspired by [RRDtool](https://oss.oetiker.ch/rrdtool/)):
+
+- **Atomic writes** — Writes to a temp file, then renames (prevents corruption on crash)
+- **Bounded size** — File stays at ~50–200 KB regardless of uptime
+- **Debounced I/O** — Flushes to disk every 30 seconds by default, not on every metric tick
+- **Graceful shutdown** — Automatically flushes on `SIGTERM`, `SIGINT`, and `process.exit`
+- **Stale data filtering** — On startup, only restores data within the retention window
+
+```javascript
+// Custom storage directory
+app.use(statusMonitor({
+  dataDir: '/var/data/my-app/metrics',
+  flushInterval: 60,  // flush every 60 seconds
+}));
+```
+
+## 🔒 Securing the Dashboard
+
+The middleware exposes a `pageRoute` handler that can be wrapped with authentication:
+
+### Using [connect-ensure-login](https://www.npmjs.com/package/connect-ensure-login)
+
+```javascript
+const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn();
+const statusMonitor = require('express-status-monitor-plus')();
+
 app.use(statusMonitor);
-app.get('/status', ensureLoggedIn, statusMonitor.pageRoute)
+app.get('/status', ensureLoggedIn, statusMonitor.pageRoute);
 ```
 
-Credits to [@mattiaerre](https://github.com/mattiaerre)
-
-Example using [http-auth](https://www.npmjs.com/package/http-auth)
+### Using [http-auth](https://www.npmjs.com/package/http-auth)
 
 ```javascript
 const auth = require('http-auth');
-const basic = auth.basic({realm: 'Monitor Area'}, function(user, pass, callback) {
-  callback(user === 'username' && pass === 'password');
+const basic = auth.basic({ realm: 'Monitor Area' }, (user, pass, callback) => {
+  callback(user === 'admin' && pass === 'secret');
 });
 
-// Set '' to config path to avoid middleware serving the html page (path must be a string not equal to the wanted route)
-const statusMonitor = require('express-status-monitor')({ path: '' });
-app.use(statusMonitor.middleware); // use the "middleware only" property to manage websockets
-app.get('/status', basic.check(statusMonitor.pageRoute)); // use the pageRoute property to serve the dashboard html page
+const statusMonitor = require('express-status-monitor-plus')({ path: '' });
+app.use(statusMonitor.middleware);
+app.get('/status', basic.check(statusMonitor.pageRoute));
 ```
 
-## Using module with socket.io in project
+## 🔌 Using with an Existing Socket.io Instance
 
-If you're using socket.io in your project, this module could break your project because this module by default will spawn its own socket.io instance. To mitigate that, fill websocket parameter with your main socket.io instance as well as port parameter.
+If your project already uses Socket.io, pass your instance to avoid conflicts:
 
-## Tests and coverage
+```javascript
+const http = require('http');
+const { Server } = require('socket.io');
+const express = require('express');
 
-In order to run test and coverage use the following npm commands:
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+app.use(require('express-status-monitor-plus')({
+  websocket: io,
+  port: 3000,
+}));
+```
+
+## 🛠 Development
 
 ```bash
+# Install dependencies
+npm install
+
+# Build assets (Rollup: JS + CSS + HTML → dist/)
+npm run build
+
+# Start dev server with live reload
+npm run dev
+
+# Watch mode (rebuild on file changes)
+npm run build:watch
+
+# Run tests
 npm test
-npm run coverage
+
+# Lint
+npm run lint
 ```
 
-## License
+### Project Structure
 
-[MIT License](https://opensource.org/licenses/MIT)
+```
+├── src/
+│   ├── helpers/
+│   │   ├── default-config.js      # Default configuration
+│   │   ├── gather-os-metrics.js   # OS/process metric collection
+│   │   ├── health-checker.js      # HTTP health check runner
+│   │   ├── metrics-store.js       # Persistent ring buffer storage
+│   │   ├── on-headers-listener.js # Response time tracking
+│   │   ├── send-metrics.js        # Socket.io metric emission
+│   │   ├── socket-io-init.js      # Socket.io + collection init
+│   │   └── validate.js            # Config validation
+│   ├── middleware-wrapper.js       # Express middleware
+│   └── public/
+│       ├── index.html             # Dashboard HTML (Handlebars template)
+│       ├── javascripts/app.js     # Client-side app (ES modules)
+│       └── stylesheets/styles.css # Dashboard styles
+├── dist/                          # Build output (gitignored)
+├── rollup.config.mjs             # Rollup build configuration
+└── test/                          # Mocha test suite
+```
+
+## 📄 License
+
+[MIT](https://opensource.org/licenses/MIT) © [MyT](https://github.com/manhbi18112005)
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ by <a href="https://github.com/manhbi18112005">MyT</a> · Originally forked from <a href="https://github.com/RafalWilinski/express-status-monitor">express-status-monitor</a></sub>
+</div>

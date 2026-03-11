@@ -29,10 +29,22 @@ describe('validate', () => {
     it('then websocket === null', () => {
       chai.expect(config.websocket).to.be.null;
     });
+
+    it(`then darkMode === ${defaultConfig.darkMode}`, () => {
+      config.darkMode.should.equal(defaultConfig.darkMode);
+    });
+
+    it('then dataDir === null', () => {
+      chai.expect(config.dataDir).to.be.null;
+    });
+
+    it(`then flushInterval === ${defaultConfig.flushInterval}`, () => {
+      config.flushInterval.should.equal(defaultConfig.flushInterval);
+    });
   });
 
   describe('when config is invalid', () => {
-    const config = validate({ title: true, path: false, spans: 'not-an-array', port: 'abc', websocket: false });
+    const config = validate({ title: true, path: false, spans: 'not-an-array', port: 'abc', websocket: false, darkMode: 123 });
 
     it(`then title === ${defaultConfig.title}`, () => {
       config.title.should.equal(defaultConfig.title);
@@ -53,10 +65,22 @@ describe('validate', () => {
     it('then websocket === null', () => {
       chai.expect(config.websocket).to.be.null;
     });
+
+    it(`then darkMode === ${defaultConfig.darkMode}`, () => {
+      config.darkMode.should.equal(defaultConfig.darkMode);
+    });
+
+    it('then dataDir === null', () => {
+      chai.expect(config.dataDir).to.be.null;
+    });
+
+    it(`then flushInterval === ${defaultConfig.flushInterval}`, () => {
+      config.flushInterval.should.equal(defaultConfig.flushInterval);
+    });
   });
 
   describe('when config is valid', () => {
-    const customConfig = { title: 'Custom title', path: '/custom-path', spans: [{}, {}, {}], port: 9999, websocket: {} };
+    const customConfig = { title: 'Custom title', path: '/custom-path', spans: [{}, {}, {}], port: 9999, websocket: {}, darkMode: 'dark' };
     const config = validate(customConfig);
 
     it(`then title === ${customConfig.title}`, () => {
@@ -77,6 +101,16 @@ describe('validate', () => {
 
     it(`then port === ${customConfig.port}`, () => {
       config.port.should.equal(customConfig.port);
+    });
+
+    it(`then darkMode === ${customConfig.darkMode}`, () => {
+      config.darkMode.should.equal(customConfig.darkMode);
+    });
+
+    it('then dataDir === /tmp/custom-dir', () => {
+      const customWithDir = validate({ dataDir: '/tmp/custom-dir', flushInterval: 60 });
+      customWithDir.dataDir.should.equal('/tmp/custom-dir');
+      customWithDir.flushInterval.should.equal(60);
     });
   });
 });

@@ -17,7 +17,7 @@ describe('on-headers-listener', () => {
       });
     });
 
-    afterEach(() => {
+    after(() => {
       clock.restore();
     });
 

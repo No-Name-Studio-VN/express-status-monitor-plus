@@ -8,11 +8,11 @@ let eventLoopStats; // eslint-disable-line
 
 try {
   eventLoopStats = require('event-loop-stats'); // eslint-disable-line
-} catch (error) {
-  console.warn('event-loop-stats not found, ignoring event loop metrics...');
+} catch {
+  debug('event-loop-stats not found, ignoring event loop metrics...');
 }
 
-module.exports = (io, span) => {
+module.exports = (io, span, metricsStore) => {
   const defaultResponse = {
     2: 0,
     3: 0,
@@ -37,6 +37,25 @@ module.exports = (io, span) => {
     stat.timestamp = Date.now();
     stat.heap = v8.getHeapStatistics();
 
+    // Detailed memory breakdown
+    const memUsage = process.memoryUsage();
+    stat.memoryBreakdown = {
+      rss: memUsage.rss / 1024 / 1024,
+      heapUsed: memUsage.heapUsed / 1024 / 1024,
+      heapTotal: memUsage.heapTotal / 1024 / 1024,
+      external: memUsage.external / 1024 / 1024,
+      arrayBuffers: memUsage.arrayBuffers / 1024 / 1024,
+    };
+
+    // System info
+    stat.systemInfo = {
+      cpuCount: os.cpus().length,
+      uptime: process.uptime(),
+      nodeVersion: process.version,
+      platform: `${os.type()} ${os.release()}`,
+      pid: process.pid,
+    };
+
     if (eventLoopStats) {
       stat.loop = eventLoopStats.sense();
     }
@@ -51,5 +70,10 @@ module.exports = (io, span) => {
     if (span.responses[0] && span.responses.length > span.retention) span.responses.shift();
 
     sendMetrics(io, span);
+
+    // Mark store for disk flush
+    if (metricsStore) {
+      metricsStore.markDirty();
+    }
   });
 };
