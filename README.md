@@ -1,13 +1,10 @@
 <div align="center">
- <br />
- <h1>
-  Express Status Monitor Plus
- </h1>
- <p>
-  Real-time server monitoring dashboard for Express.js&nbsp;—&nbsp;zero-config, self-hosted, production-ready. A free and open-source alternative to commercial APMs like New Relic, Datadog, and AppDynamics.
- </p>
- <br />
- <p>
+<h1>🚀 Express Status Monitor Plus</h1>
+<p>
+<b>Real-time, zero-config, self-hosted APM dashboard for Node.js & Express.js</b>
+</p>
+<br />
+<p>
   <a href="https://www.npmjs.com/package/express-status-monitor-plus"><img src="https://img.shields.io/npm/v/express-status-monitor-plus.svg?style=flat-square&color=007aff" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/express-status-monitor-plus"><img src="https://img.shields.io/npm/dm/express-status-monitor-plus.svg?style=flat-square&color=30d158" alt="npm downloads" /></a>
   <a href="https://github.com/No-Name-Studio-VN/express-status-monitor-plus/actions/workflows/npm-publish.yml"><img src="https://img.shields.io/github/actions/workflow/status/No-Name-Studio-VN/express-status-monitor-plus/npm-publish.yml?style=flat-square&label=CI" alt="CI status" /></a>
@@ -16,31 +13,33 @@
  </p>
 </div>
 
-<br />
+**Express Status Monitor Plus** is a lightweight, production-ready Application Performance Monitoring (APM) tool. It provides a beautiful, modern dashboard to track your server's health in real-time.
 
-> **Note:** Starting with v2.0, this project will be operating as an independent fork of the original [express-status-monitor](https://github.com/RafalWilinski/express-status-monitor).
+As an independent, heavily upgraded fork of the original `express-status-monitor`, this **Plus** version introduces critical enterprise features like persistent metrics across restarts, P50/P95/P99 percentiles, dark mode, and upstream health checks—all without the steep cost of commercial APMs like Datadog or New Relic.
 
-![Dashboard Preview](./assets/showcase.gif)
+## ✨ Why choose "Plus"? (Key Features)
 
-## ✨ Features
+* 💾 **Persistent Storage:** Metrics survive process restarts and deployments via a highly optimized, file-based ring buffer.
+* 📊 **Advanced Percentiles:** Built-in reservoir sampling for P50, P95, and P99 response time tracking to catch edge-case latency.
+* 🏥 **Service Health Checks:** Monitor the uptime of your upstream services and third-party APIs directly from the dashboard.
+* 🎨 **Modernized UI:** Glassmorphism headers, dark/light/system themes, interactive charts with smooth animations.
+* ⚡ **Ultra-Lightweight:** Just one single middleware and a ~200 KB bundled frontend. Zero massive dependencies.
+* 📈 **Comprehensive Metrics:** Tracks CPU, memory, heap, load average, event loop latency, response times, requests/sec, and HTTP status codes.
 
-- **Real-time monitoring** — CPU, memory, heap, load average, event loop latency, response times, requests/sec, and HTTP status codes
-- **Persistent storage** — Metrics survive process restarts via a file-based ring buffer
-- **Response time percentiles** — P50, P95, P99 tracking with reservoir sampling
-- **Health checks** — Monitor upstream service availability with configurable endpoints
-- **Modern UI** — Dark/light/system themes, glassmorphism header, per-metric accent colors, smooth animations
-- **Interactive Charts** — Zoom in/out, reset zoom, and download chart as PNG
-- **Lightweight** — Single middleware, ~200 KB bundled, minimal runtime overhead
+---
 
 ## 📦 Installation
 
 ```bash
 npm install express-status-monitor-plus
+
 ```
 
-**Requirements:** Node.js ≥ 18
+*Requires Node.js ≥ 18*
 
 ## 🚀 Quick Start
+
+Add the monitor as the **very first middleware** in your Express application, before any other routes or middleware.
 
 ```javascript
 const express = require('express');
@@ -48,44 +47,44 @@ const statusMonitor = require('express-status-monitor-plus');
 
 const app = express();
 
-// Add as the FIRST middleware, before any routes
+// Initialize the dashboard and data collection
 app.use(statusMonitor());
 
 app.get('/', (req, res) => res.send('Hello World'));
 
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
-  console.log('Dashboard at http://localhost:3000/status');
+  console.log('Dashboard available at http://localhost:3000/status');
 });
+
 ```
 
-Open **http://localhost:3000/status** to view the dashboard.
+Navigate to **[`http://localhost:3000/status`](https://www.google.com/search?q=http://localhost:3000/status)** to view your live metrics!
 
-## ⚙️ Configuration
+---
 
-Pass an options object to customize behavior:
+## ⚙️ Advanced Configuration
+
+Pass a configuration object to tailor the dashboard exactly to your infrastructure needs.
 
 ```javascript
 app.use(statusMonitor({
-  title: 'Express Status Monitor',   // Dashboard page title
-  path: '/status',                    // Dashboard URL path
+  title: 'Express Status Monitor Plus',       // Dashboard page title
+  path: '/status',                   // Dashboard URL path
   socketPath: '/socket.io',          // Socket.io endpoint path
+  darkMode: 'auto',                  // 'auto' | 'dark' | 'light'
+  
+  // Storage & Persistence
+  dataDir: '/var/data/my-app/metrics', // Custom metrics directory
+  flushInterval: 30,                   // Seconds between disk writes
+  
+  // Data retention rules (interval in seconds, retention in data points)
+  spans: { interval: 5,  retention: 60 },  // 1 point/5sec, keep for 5 min
 
-  // Data collection spans (interval in seconds, retention in data points)
-  spans: [
-    { interval: 1,  retention: 60 },  // 1 point/sec,  keep 60 points (1 min)
-    { interval: 5,  retention: 60 },  // 1 point/5sec, keep 60 points (5 min)
-    { interval: 15, retention: 60 },  // 1 point/15sec, keep 60 points (15 min)
-  ],
+  // Exclude specific routes from tracking
+  ignoreStartsWith: '/admin',
 
-  // Persistent storage
-  dataDir: null,                      // Metrics directory (default: os.tmpdir()/express-status-monitor)
-  flushInterval: 30,                  // Seconds between disk writes (default: 30)
-
-  // Appearance
-  darkMode: 'auto',                   // 'auto' | 'dark' | 'light'
-
-  // Chart visibility
+  // Toggle specific charts
   chartVisibility: {
     cpu: true,
     mem: true,
@@ -96,23 +95,13 @@ app.use(statusMonitor({
     rps: true,
     statusCodes: true,
   },
-
-  // Networking
-  port: null,                         // Custom port for Socket.io (null = use Express server)
-  websocket: null,                    // Pass your own Socket.io instance
-  iframe: false,                      // Allow embedding in iframes
-
-  // Filtering
-  ignoreStartsWith: '/admin',         // Ignore routes starting with this prefix
-
-  // Health checks (see below)
-  healthChecks: [],
 }));
+
 ```
 
-## 🏥 Health Checks
+## 🏥 Upstream Health Checks
 
-Add HTTP health check endpoints that are displayed at the bottom of the dashboard:
+Keep an eye on the databases, microservices, or external APIs your Express app relies on. Endpoints returning a `200 OK` are marked as healthy, while timeouts or other status codes trigger a failure alert on your dashboard.
 
 ```javascript
 app.use(statusMonitor({
@@ -120,69 +109,41 @@ app.use(statusMonitor({
     {
       protocol: 'http',
       host: 'localhost',
-      path: '/api/health',
+      path: '/api/internal/health',
       port: '3000',
     },
     {
       protocol: 'https',
-      host: 'api.example.com',
-      path: '/ping',
+      host: 'api.stripe.com',
+      path: '/v1/ping',
       port: '443',
     },
   ],
 }));
+
 ```
 
-Each endpoint is polled periodically. A `200` status code is considered **OK**, anything else is marked as **FAILED**.
+## 🔒 Securing the Dashboard in Production
 
-## 💾 Persistent Metrics
+You should absolutely protect your `/status` route in production. The middleware exposes a `pageRoute` handler that easily wraps around your existing authentication strategies.
 
-By default, metrics are stored on disk so they survive process restarts. The storage engine uses a **fixed-size ring buffer** (inspired by [RRDtool](https://oss.oetiker.ch/rrdtool/)):
-
-- **Atomic writes** — Writes to a temp file, then renames (prevents corruption on crash)
-- **Bounded size** — File stays at ~50–200 KB regardless of uptime
-- **Debounced I/O** — Flushes to disk every 30 seconds by default, not on every metric tick
-- **Graceful shutdown** — Automatically flushes on `SIGTERM`, `SIGINT`, and `process.exit`
-- **Stale data filtering** — On startup, only restores data within the retention window
-
-```javascript
-// Custom storage directory
-app.use(statusMonitor({
-  dataDir: '/var/data/my-app/metrics',
-  flushInterval: 60,  // flush every 60 seconds
-}));
-```
-
-## 🔒 Securing the Dashboard
-
-The middleware exposes a `pageRoute` handler that can be wrapped with authentication:
-
-### Using [connect-ensure-login](https://www.npmjs.com/package/connect-ensure-login)
-
-```javascript
-const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn();
-const statusMonitor = require('express-status-monitor-plus')();
-
-app.use(statusMonitor);
-app.get('/status', ensureLoggedIn, statusMonitor.pageRoute);
-```
-
-### Using [http-auth](https://www.npmjs.com/package/http-auth)
+**Example using `http-auth` (Basic Auth):**
 
 ```javascript
 const auth = require('http-auth');
 const basic = auth.basic({ realm: 'Monitor Area' }, (user, pass, callback) => {
-  callback(user === 'admin' && pass === 'secret');
+  callback(user === 'admin' && pass === 'supersecret');
 });
 
 const statusMonitor = require('express-status-monitor-plus')({ path: '' });
+
 app.use(statusMonitor.middleware);
 app.get('/status', basic.check(statusMonitor.pageRoute));
 ```
 
-## 🔌 Using with an Existing Socket.io Instance
+## 🔌 Custom Socket.io Instances
 
-If your project already uses Socket.io, pass your instance to avoid conflicts:
+If your application already leverages WebSockets, pass your existing Socket.io instance to prevent port conflicts and reuse your existing upgrade handlers.
 
 ```javascript
 const http = require('http');
@@ -197,6 +158,7 @@ app.use(require('express-status-monitor-plus')({
   websocket: io,
   port: 3000,
 }));
+
 ```
 
 ## 🛠 Development
