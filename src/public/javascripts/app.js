@@ -617,6 +617,11 @@ class Dashboard {
             this.updatePercentile('p99', data.percentiles.p99);
         }
 
+        // Trends
+        if (data.trends) {
+            this.updateTrends(data.trends);
+        }
+
         // Update all charts (no trimming — infinite retention)
         for (const { chart } of this.charts.values()) {
             chart.update('none');
@@ -662,6 +667,49 @@ class Dashboard {
         if (el && value !== undefined) {
             el.textContent = typeof value === 'number' ? value.toFixed(2) : '--';
         }
+    }
+
+    /**
+     * Update trend indicators on summary cards.
+     * For resource metrics (cpu, mem, heap, load): up = red (bad), down = green (good)
+     * For throughput metrics (rps): up = green (good), down = red (bad)
+     */
+    updateTrends(trends) {
+        // Resource metrics: up is bad (red), down is good (green)
+        this.updateTrend('cpu', trends.cpu, false);
+        this.updateTrend('mem', trends.mem, false);
+        this.updateTrend('heap', trends.heap, false);
+        this.updateTrend('load', trends.load, false);
+        // Throughput: up is good (green)
+        this.updateTrend('rps', trends.rps, true);
+    }
+
+    updateTrend(metric, value, upIsGood) {
+        const el = document.getElementById(`${metric}Trend`);
+        if (!el) return;
+
+        // Hide if no data or near-zero change
+        if (value === undefined || value === null || Math.abs(value) < 0.1) {
+            el.className = 'trend';
+            el.textContent = '';
+            return;
+        }
+
+        const isUp = value > 0;
+        const arrow = isUp ? '↑' : '↓';
+        const absVal = Math.abs(value);
+        const display = absVal >= 100 ? Math.round(absVal) : absVal.toFixed(1);
+
+        // Determine color class
+        let colorClass;
+        if (upIsGood) {
+            colorClass = isUp ? 'trend-down' : 'trend-up'; // trend-down = green, trend-up = red
+        } else {
+            colorClass = isUp ? 'trend-up' : 'trend-down';
+        }
+
+        el.className = `trend ${colorClass}`;
+        el.textContent = `${arrow} ${display}%`;
     }
 
     updateSystemInfo(info) {
