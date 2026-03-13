@@ -1,7 +1,7 @@
 {
 	"name": "express-status-monitor-plus",
 	"version": "3.1.0",
-	"description": "Express-Status-Monitor+ is a free Real-time server monitoring dashboard for Express.js.",
+	"description": "A modern, real-time monitoring dashboard for Express.js featuring persistent metrics, upstream health checks, response percentiles, and zero-config setup.",
 	"main": "index.js",
 	"keywords": [
 		"node",
