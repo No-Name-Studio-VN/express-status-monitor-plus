@@ -22,9 +22,6 @@
         <h1 class="header-title">{{title}}</h1>
       </div>
 
-      <div class="header-center">
-        <time class="header-time" id="currentTime">--</time>
-      </div>
 
       <div class="header-controls" id="spanControls">
         <!-- Span buttons injected by JS -->
@@ -279,30 +276,34 @@
       {{{healthCheckList healthCheckResults}}}
     </div>
 
-    <!-- System Info -->
-    <div class="system-info" id="systemInfo">
-      <div class="system-info-item">
-        <span class="system-info-label">Node</span>
-        <span class="system-info-value" id="sysNodeVersion">--</span>
-      </div>
-      <div class="system-info-item">
-        <span class="system-info-label">Platform</span>
-        <span class="system-info-value" id="sysPlatform">--</span>
-      </div>
-      <div class="system-info-item">
-        <span class="system-info-label">PID</span>
-        <span class="system-info-value" id="sysPid">--</span>
-      </div>
-      <div class="system-info-item">
-        <span class="system-info-label">Uptime</span>
-        <span class="system-info-value" id="sysUptime">--</span>
-      </div>
-      <div class="system-info-item">
-        <span class="system-info-label">CPUs</span>
-        <span class="system-info-value" id="sysCpuCount">--</span>
-      </div>
-    </div>
   </div>
+
+  <!-- System Info Footer -->
+  <footer class="system-info" id="systemInfo">
+    <div class="system-info-item">
+      <span class="system-info-label">Node</span>
+      <span class="system-info-value" id="sysNodeVersion">--</span>
+    </div>
+    <div class="system-info-item">
+      <span class="system-info-label">Platform</span>
+      <span class="system-info-value" id="sysPlatform">--</span>
+    </div>
+    <div class="system-info-item">
+      <span class="system-info-label">PID</span>
+      <span class="system-info-value" id="sysPid">--</span>
+    </div>
+    <div class="system-info-item">
+      <span class="system-info-label">Uptime</span>
+      <span class="system-info-value" id="sysUptime">--</span>
+    </div>
+    <div class="system-info-item">
+      <span class="system-info-label">CPUs</span>
+      <span class="system-info-value" id="sysCpuCount">--</span>
+    </div>
+    <div class="system-info-time">
+      <time class="system-info-value" id="currentTime">--</time>
+    </div>
+  </footer>
 
   <!-- Scroll to top -->
   <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
