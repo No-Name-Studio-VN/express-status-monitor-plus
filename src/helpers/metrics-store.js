@@ -5,19 +5,19 @@ const path = require('path');
 const os = require('os');
 const debug = require('debug')('express-status-monitor');
 
-const STORE_VERSION = 1;
+const STORE_VERSION = 2;
 
 class MetricsStore {
   /**
    * @param {object} options
    * @param {string} options.dataDir - Directory for the metrics file
    * @param {number} options.flushInterval - Seconds between disk flushes
-   * @param {Array}  options.spans - Span configurations
+   * @param {object} options.span - Span configuration { interval }
    */
   constructor(options = {}) {
     this.dataDir = options.dataDir || path.join(os.tmpdir(), 'express-status-monitor');
     this.flushInterval = (options.flushInterval || 30) * 1000;
-    this.spans = options.spans || [];
+    this.span = options.span || {};
     this.filePath = path.join(this.dataDir, 'metrics.json');
     this._dirty = false;
     this._flushTimer = null;
@@ -37,24 +37,28 @@ class MetricsStore {
       const raw = fs.readFileSync(this.filePath, 'utf8');
       const data = JSON.parse(raw);
 
+      // Handle version migration
+      if (data.version === 1 && data.spans) {
+        // Migrate from v1 multi-span format: use first span's data
+        const stored = data.spans.find(s => s.interval === this.span.interval) || data.spans[0];
+        if (stored) {
+          this.span.os = stored.os || [];
+          this.span.responses = (stored.responses || []);
+          debug(`Migrated v1 data: ${this.span.os.length} os points, ${this.span.responses.length} response points`);
+        }
+        return;
+      }
+
       if (data.version !== STORE_VERSION) {
         debug('Metrics file version mismatch, starting fresh');
         return;
       }
 
-      // Match stored spans to current config by interval
-      for (const span of this.spans) {
-        const stored = data.spans?.find(s => s.interval === span.interval);
-        if (!stored) continue;
-
-        // Restore os metrics — filter out stale data beyond retention window
-        const cutoff = Date.now() - (span.interval * span.retention * 1000);
-        span.os = (stored.os || []).filter(pt => pt.timestamp > cutoff);
-        span.responses = (stored.responses || []).filter(pt => pt.timestamp > cutoff);
-
-        debug(
-          `Restored span ${span.interval}s: ${span.os.length} os points, ${span.responses.length} response points`
-        );
+      // Restore single span data (no cutoff — infinite retention)
+      if (data.span) {
+        this.span.os = data.span.os || [];
+        this.span.responses = data.span.responses || [];
+        debug(`Restored: ${this.span.os.length} os points, ${this.span.responses.length} response points`);
       }
     } catch (err) {
       debug('Failed to load metrics file: %s', err.message);
@@ -108,17 +112,16 @@ class MetricsStore {
       const data = {
         version: STORE_VERSION,
         updated: Date.now(),
-        spans: this.spans.map(span => ({
-          interval: span.interval,
-          retention: span.retention,
-          os: span.os || [],
+        span: {
+          interval: this.span.interval,
+          os: this.span.os || [],
           // Strip responseTimes array from stored responses (too large, not needed for history)
-          responses: (span.responses || []).map(r => {
+          responses: (this.span.responses || []).map(r => {
             const copy = { ...r };
             delete copy.responseTimes;
             return copy;
           }),
-        })),
+        },
       };
 
       const json = JSON.stringify(data);

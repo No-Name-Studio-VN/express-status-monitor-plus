@@ -2,20 +2,9 @@ module.exports = {
   title: 'Express Status Monitor',
   path: '/status',
   socketPath: '/socket.io',
-  spans: [
-    {
-      interval: 1,
-      retention: 60,
-    },
-    {
-      interval: 5,
-      retention: 60,
-    },
-    {
-      interval: 15,
-      retention: 60,
-    },
-  ],
+  span: {
+    interval: 3, // seconds between data points
+  },
   port: null,
   websocket: null,
   iframe: false,

@@ -7,21 +7,16 @@ const defaultConfig = require('../../src/helpers/default-config');
 
 describe('socket-io-init', () => {
   describe('when invoked', () => {
-    it('then all spans should have os and responses property', () => {
-      const spans = defaultConfig.spans;
+    it('then span should have os and responses property', () => {
+      const config = { ...defaultConfig, span: { ...defaultConfig.span } };
+      const span = config.span;
 
-      spans.forEach((span) => {
-        span.should.not.have.property('os');
-        // info: not working as if it was another test interfering
-        // span.should.not.have.property('responses');
-      });
+      span.should.not.have.property('os');
 
-      socketIoInit({}, defaultConfig);
+      socketIoInit({}, config);
 
-      spans.forEach((span) => {
-        span.should.have.property('os');
-        span.should.have.property('responses');
-      });
+      span.should.have.property('os');
+      span.should.have.property('responses');
     });
   });
 });

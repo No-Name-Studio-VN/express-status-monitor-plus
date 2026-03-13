@@ -39,13 +39,6 @@ const CHART_CONFIGS = {
 };
 
 // ── Time formatter using Intl ──────────────────────────────────
-const timeFormatter = new Intl.DateTimeFormat(undefined, {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-});
-
 const fullFormatter = new Intl.DateTimeFormat(undefined, {
     year: 'numeric',
     month: 'short',
@@ -171,9 +164,6 @@ function createChartOptions() {
 class Dashboard {
     constructor() {
         this.charts = new Map();
-        this.spans = [];
-        this.defaultSpan = 0;
-        this.previousValues = {};
 
         this.initSocket();
         this.initCharts();
@@ -479,21 +469,18 @@ class Dashboard {
     handleStart(data) {
         this.updateTime();
 
-        const spanData = data[this.defaultSpan];
-        if (!spanData) return;
+        if (!data) return;
 
+        // data is a single span object: { os: [], responses: [], interval }
         // Remove last incomplete data points
-        spanData.responses.pop();
-        spanData.os.pop();
+        if (data.responses?.length) data.responses.pop();
+        if (data.os?.length) data.os.pop();
 
-        this.populateInitialData(spanData);
-        this.updateSpanControls(data);
+        this.populateInitialData(data);
     }
 
     handleStats(data) {
-        const currentSpan = this.spans[this.defaultSpan];
-        if (!currentSpan) return;
-        if (data.retention !== currentSpan.retention || data.interval !== currentSpan.interval) return;
+        if (!data) return;
 
         this.updateTime();
         this.updateFromStats(data);
@@ -616,7 +603,6 @@ class Dashboard {
                     statusChart.chart.data.datasets[i].data.push(data.responses[i + 2] || 0);
                 }
                 statusChart.chart.data.labels.push(ts);
-                this.trimChart(statusChart.chart);
 
                 // Status codes stat: total requests
                 const total = (data.responses[2] || 0) + (data.responses[3] || 0) + (data.responses[4] || 0) + (data.responses[5] || 0);
@@ -631,9 +617,8 @@ class Dashboard {
             this.updatePercentile('p99', data.percentiles.p99);
         }
 
-        // Trim and update all charts
+        // Update all charts (no trimming — infinite retention)
         for (const { chart } of this.charts.values()) {
-            this.trimChart(chart);
             chart.update('none');
         }
     }
@@ -722,44 +707,6 @@ class Dashboard {
                 this.updateSummaryCard('rps', lastResp.count?.toFixed(2));
             }
         }
-    }
-
-    trimChart(chart) {
-        const retention = this.spans[this.defaultSpan]?.retention;
-        if (!retention) return;
-        while (chart.data.labels.length > retention) {
-            chart.data.labels.shift();
-            chart.data.datasets.forEach(ds => ds.data.shift());
-        }
-    }
-
-    // ── Span controls ──────────────────────────────────────────
-    updateSpanControls(data) {
-        const container = document.getElementById('spanControls');
-        if (!container || data.length === this.spans.length) return;
-
-        container.innerHTML = '';
-        this.spans = data.map((span, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'span-btn';
-            const minutes = (span.retention * span.interval) / 60;
-            btn.textContent = minutes >= 60 ? `${(minutes / 60).toFixed(0)}H` : `${minutes}M`;
-            btn.dataset.index = index;
-
-            btn.addEventListener('click', () => {
-                container.querySelectorAll('.span-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.defaultSpan = index;
-                this.socket.emit('esm_change');
-            });
-
-            container.appendChild(btn);
-            return { retention: span.retention, interval: span.interval };
-        });
-
-        // Activate first button
-        const firstBtn = container.querySelector('.span-btn');
-        if (firstBtn) firstBtn.classList.add('active');
     }
 }
 

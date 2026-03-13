@@ -96,7 +96,7 @@ const middlewareWrapper = config => {
     } else {
       if (!req.path.startsWith(validatedConfig.ignoreStartsWith)) {
         onHeaders(res, () => {
-          onHeadersListener(res.statusCode, startTime, validatedConfig.spans);
+          onHeadersListener(res.statusCode, startTime, validatedConfig.span);
         });
       }
 

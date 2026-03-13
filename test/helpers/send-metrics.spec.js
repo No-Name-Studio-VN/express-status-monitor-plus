@@ -7,7 +7,7 @@ const sendMetrics = require('../../src/helpers/send-metrics');
 
 describe('send-metrics', () => {
   describe('when invoked', () => {
-    it('then io.emit called', () => {
+    it('then io.emit called with esm_stats', () => {
       const io = { emit: sinon.stub() };
       const span = { os: [], responses: [] };
 

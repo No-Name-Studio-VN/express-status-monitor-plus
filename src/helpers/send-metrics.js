@@ -22,8 +22,7 @@ module.exports = (io, span) => {
   io.emit('esm_stats', {
     os: lastOs,
     responses: lastResponse,
-    interval: span.interval,
-    retention: span.retention,
     percentiles,
+    timestamp: Date.now(),
   });
 };

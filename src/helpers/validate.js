@@ -1,4 +1,5 @@
 const defaultConfig = require('./default-config');
+const debug = require('debug')('express-status-monitor');
 
 module.exports = config => {
   if (!config) {
@@ -20,8 +21,23 @@ module.exports = config => {
     typeof config.path === 'string' ? config.path : defaultConfig.path;
   config.socketPath =
     typeof config.socketPath === 'string' ? config.socketPath : defaultConfig.socketPath;
-  config.spans =
-    typeof config.spans === 'object' ? config.spans : defaultConfig.spans;
+
+  // Single span validation (backward-compat: migrate spans[] → span)
+  if (config.spans && Array.isArray(config.spans) && !config.span) {
+    debug('DEPRECATED: config.spans is deprecated, use config.span = { interval } instead');
+    config.span = { interval: config.spans[0]?.interval || defaultConfig.span.interval };
+  }
+  if (typeof config.span === 'object' && config.span !== null) {
+    config.span = {
+      interval: typeof config.span.interval === 'number' && config.span.interval > 0
+        ? config.span.interval
+        : defaultConfig.span.interval,
+    };
+  } else {
+    config.span = { ...defaultConfig.span };
+  }
+  delete config.spans;
+
   config.port =
     typeof config.port === 'number' ? config.port : defaultConfig.port;
   config.websocket =

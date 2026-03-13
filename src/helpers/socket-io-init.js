@@ -10,27 +10,23 @@ let io;
 let metricsStore;
 
 const addSocketEvents = (socket, config) => {
-  socket.emit('esm_start', config.spans);
-  socket.on('esm_change', () => {
-    socket.emit('esm_start', config.spans);
-  });
+  socket.emit('esm_start', config.span);
 };
 
 /**
- * Initialize metric collection intervals.
+ * Initialize metric collection interval.
  * Called once when the middleware is first mounted — starts collecting
  * immediately, regardless of whether any dashboard clients are connected.
  */
 const startCollection = (config) => {
-  config.spans.forEach(span => {
-    if (!span.os) span.os = [];
-    if (!span.responses) span.responses = [];
+  const span = config.span;
+  if (!span.os) span.os = [];
+  if (!span.responses) span.responses = [];
 
-    const interval = setInterval(() => gatherOsMetrics(io, span, metricsStore), span.interval * 1000);
+  const interval = setInterval(() => gatherOsMetrics(io, span, metricsStore), span.interval * 1000);
 
-    // Don't keep Node.js process up
-    interval.unref();
-  });
+  // Don't keep Node.js process up
+  interval.unref();
 };
 
 module.exports = (server, config) => {
@@ -45,7 +41,7 @@ module.exports = (server, config) => {
     metricsStore = new MetricsStore({
       dataDir: config.dataDir,
       flushInterval: config.flushInterval,
-      spans: config.spans,
+      span: config.span,
     });
     metricsStore.load();
     metricsStore.startAutoFlush();

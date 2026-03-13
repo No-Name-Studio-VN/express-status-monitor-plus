@@ -261,34 +261,6 @@ body {
     }
 }
 
-/* Span selector buttons */
-.span-btn {
-    padding: 5px var(--space-3);
-    font-size: var(--text-2xs);
-    font-weight: 600;
-    font-family: var(--font-mono);
-    color: var(--text-tertiary);
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-xs);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    white-space: nowrap;
-    line-height: 1;
-    letter-spacing: 0;
-}
-
-.span-btn:hover {
-    background: var(--bg-glass-hover);
-    border-color: var(--border-color-strong);
-    color: var(--text-secondary);
-}
-
-.span-btn.active {
-    background: var(--accent-cpu);
-    color: #ffffff;
-    border-color: var(--accent-cpu);
-}
 
 /* --- Summary Cards Grid --- */
 .summary-grid {

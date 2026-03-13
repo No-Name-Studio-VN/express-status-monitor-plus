@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-expressions */
+ 
 const chai = require('chai');
 
 chai.should();
@@ -18,8 +18,8 @@ describe('validate', () => {
       config.path.should.equal(defaultConfig.path);
     });
 
-    it(`then spans === ${JSON.stringify(defaultConfig.spans)}`, () => {
-      config.spans.should.equal(defaultConfig.spans);
+    it(`then span.interval === ${defaultConfig.span.interval}`, () => {
+      config.span.interval.should.equal(defaultConfig.span.interval);
     });
 
     it('then port === null', () => {
@@ -44,7 +44,7 @@ describe('validate', () => {
   });
 
   describe('when config is invalid', () => {
-    const config = validate({ title: true, path: false, spans: 'not-an-array', port: 'abc', websocket: false, darkMode: 123 });
+    const config = validate({ title: true, path: false, span: 'not-an-object', port: 'abc', websocket: false, darkMode: 123 });
 
     it(`then title === ${defaultConfig.title}`, () => {
       config.title.should.equal(defaultConfig.title);
@@ -54,8 +54,8 @@ describe('validate', () => {
       config.path.should.equal(defaultConfig.path);
     });
 
-    it(`then spans === ${JSON.stringify(defaultConfig.spans)}`, () => {
-      config.spans.should.equal(defaultConfig.spans);
+    it(`then span.interval === ${defaultConfig.span.interval}`, () => {
+      config.span.interval.should.equal(defaultConfig.span.interval);
     });
 
     it('then port === null', () => {
@@ -80,7 +80,7 @@ describe('validate', () => {
   });
 
   describe('when config is valid', () => {
-    const customConfig = { title: 'Custom title', path: '/custom-path', spans: [{}, {}, {}], port: 9999, websocket: {}, darkMode: 'dark' };
+    const customConfig = { title: 'Custom title', path: '/custom-path', span: { interval: 5 }, port: 9999, websocket: {}, darkMode: 'dark' };
     const config = validate(customConfig);
 
     it(`then title === ${customConfig.title}`, () => {
@@ -91,8 +91,8 @@ describe('validate', () => {
       config.path.should.equal(customConfig.path);
     });
 
-    it(`then spans === ${JSON.stringify(customConfig.spans)}`, () => {
-      config.spans.should.equal(customConfig.spans);
+    it('then span.interval === 5', () => {
+      config.span.interval.should.equal(5);
     });
 
     it('then websocket === {}', () => {
@@ -111,6 +111,14 @@ describe('validate', () => {
       const customWithDir = validate({ dataDir: '/tmp/custom-dir', flushInterval: 60 });
       customWithDir.dataDir.should.equal('/tmp/custom-dir');
       customWithDir.flushInterval.should.equal(60);
+    });
+  });
+
+  describe('backward compatibility: spans[] → span', () => {
+    it('should migrate spans[0].interval to span.interval', () => {
+      const config = validate({ spans: [{ interval: 10, retention: 60 }] });
+      config.span.interval.should.equal(10);
+      chai.expect(config.spans).to.be.undefined;
     });
   });
 });
