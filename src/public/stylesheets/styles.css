@@ -180,9 +180,9 @@ body {
 
 /* --- Layout --- */
 .app-container {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: var(--space-5) var(--space-6) var(--space-12);
+    padding: var(--space-5) var(--space-5) var(--space-12);
 }
 
 /* --- Header --- */
@@ -202,9 +202,9 @@ body {
 }
 
 .header-inner {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: var(--space-3) var(--space-6);
+    padding: var(--space-3) var(--space-5);
     display: flex;
     align-items: center;
     justify-content: space-between;
