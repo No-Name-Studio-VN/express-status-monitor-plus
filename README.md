@@ -4,13 +4,13 @@
   Express Status Monitor Plus
  </h1>
  <p>
-  Real-time server monitoring dashboard for Express.js&nbsp;—&nbsp;zero-config, self-hosted, production-ready.
+  Real-time server monitoring dashboard for Express.js&nbsp;—&nbsp;zero-config, self-hosted, production-ready. A free and open-source alternative to commercial APMs like New Relic, Datadog, and AppDynamics.
  </p>
  <br />
  <p>
   <a href="https://www.npmjs.com/package/express-status-monitor-plus"><img src="https://img.shields.io/npm/v/express-status-monitor-plus.svg?style=flat-square&color=007aff" alt="npm version" /></a>
   <a href="https://www.npmjs.com/package/express-status-monitor-plus"><img src="https://img.shields.io/npm/dm/express-status-monitor-plus.svg?style=flat-square&color=30d158" alt="npm downloads" /></a>
-  <a href="https://github.com/manhbi18112005/express-status-monitor-plus/actions/workflows/npm-publish.yml"><img src="https://img.shields.io/github/actions/workflow/status/manhbi18112005/express-status-monitor-plus/npm-publish.yml?style=flat-square&label=CI" alt="CI status" /></a>
+  <a href="https://github.com/No-Name-Studio-VN/express-status-monitor-plus/actions/workflows/npm-publish.yml"><img src="https://img.shields.io/github/actions/workflow/status/No-Name-Studio-VN/express-status-monitor-plus/npm-publish.yml?style=flat-square&label=CI" alt="CI status" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="MIT License" /></a>
   <a href="https://discord.gg/nCQbSag"><img src="https://img.shields.io/discord/425670185089892362?style=flat-square&color=5865F2&logo=discord&logoColor=white&label=discord" alt="Discord" /></a>
  </p>
@@ -25,14 +25,12 @@
 ## ✨ Features
 
 - **Real-time monitoring** — CPU, memory, heap, load average, event loop latency, response times, requests/sec, and HTTP status codes
-- **Persistent storage** — Metrics survive process restarts via a file-based ring buffer (inspired by RRDtool)
+- **Persistent storage** — Metrics survive process restarts via a file-based ring buffer
 - **Response time percentiles** — P50, P95, P99 tracking with reservoir sampling
 - **Health checks** — Monitor upstream service availability with configurable endpoints
-- **Apple-inspired UI** — Dark/light/system themes, glassmorphism header, per-metric accent colors, smooth animations
-- **Chart toolbars** — Zoom in/out, reset zoom, and download chart as PNG
-- **Zero CDN dependencies** — All assets bundled with Rollup (Chart.js, Socket.io client, CSS)
+- **Modern UI** — Dark/light/system themes, glassmorphism header, per-metric accent colors, smooth animations
+- **Interactive Charts** — Zoom in/out, reset zoom, and download chart as PNG
 - **Lightweight** — Single middleware, ~200 KB bundled, minimal runtime overhead
-- **Tree-shaken** — Only imports the Chart.js components actually used
 
 ## 📦 Installation
 
@@ -223,35 +221,12 @@ npm test
 npm run lint
 ```
 
-### Project Structure
-
-```
-├── src/
-│   ├── helpers/
-│   │   ├── default-config.js      # Default configuration
-│   │   ├── gather-os-metrics.js   # OS/process metric collection
-│   │   ├── health-checker.js      # HTTP health check runner
-│   │   ├── metrics-store.js       # Persistent ring buffer storage
-│   │   ├── on-headers-listener.js # Response time tracking
-│   │   ├── send-metrics.js        # Socket.io metric emission
-│   │   ├── socket-io-init.js      # Socket.io + collection init
-│   │   └── validate.js            # Config validation
-│   ├── middleware-wrapper.js       # Express middleware
-│   └── public/
-│       ├── index.html             # Dashboard HTML (Handlebars template)
-│       ├── javascripts/app.js     # Client-side app (ES modules)
-│       └── stylesheets/styles.css # Dashboard styles
-├── dist/                          # Build output (gitignored)
-├── rollup.config.mjs             # Rollup build configuration
-└── test/                          # Mocha test suite
-```
-
 ## 📄 License
 
-[MIT](https://opensource.org/licenses/MIT) © [MyT](https://github.com/manhbi18112005)
+[MIT](https://opensource.org/licenses/MIT)
 
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by <a href="https://github.com/manhbi18112005">MyT</a> · Originally forked from <a href="https://github.com/RafalWilinski/express-status-monitor">express-status-monitor</a></sub>
+  <sub>Built with ❤️ by <a href="https://github.com/No-Name-Studio-VN">No Name Studio</a> · Originally forked from <a href="https://github.com/RafalWilinski/express-status-monitor">express-status-monitor</a></sub>
 </div>

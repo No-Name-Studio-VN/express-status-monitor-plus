@@ -1,7 +1,7 @@
 {
 	"name": "express-status-monitor-plus",
-	"version": "3.0.2",
-	"description": "Express-Status-Monitor+ is a modified version of express-status-monitor (made by @RafalWilinski) with additional features!",
+	"version": "3.1.0",
+	"description": "Express-Status-Monitor+ is a free Real-time server monitoring dashboard for Express.js.",
 	"main": "index.js",
 	"keywords": [
 		"node",
@@ -83,7 +83,7 @@
 		"test": "mocha --recursive",
 		"test:watch": "mocha --recursive --watch",
 		"benchmark": "node examples/tester.js",
-		"lint": "eslint .",
+		"lint": "eslint . --fix",
 		"prepare": "npm run build"
 	},
 	"devDependencies": {
