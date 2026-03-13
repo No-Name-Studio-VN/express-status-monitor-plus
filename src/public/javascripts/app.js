@@ -179,6 +179,7 @@ class Dashboard {
         this.initCharts();
         this.initScrollBehavior();
         this.initThemeListener();
+        this.initLayoutToggle();
     }
 
     // ── Socket.io ──────────────────────────────────────────────
@@ -399,6 +400,45 @@ class Dashboard {
         this.updateThemeIcon();
         this.updateThemeDropdownActive(value);
         this.refreshChartTheme();
+    }
+
+    // ── Layout toggle ──────────────────────────────────────────
+    initLayoutToggle() {
+        const container = document.getElementById('layoutToggle');
+        if (!container) return;
+
+        const buttons = container.querySelectorAll('.layout-btn');
+        const saved = localStorage.getItem('esm-layout') || '2';
+
+        // Apply saved layout
+        this.applyLayout(saved, buttons);
+
+        // Wire click handlers
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const cols = btn.dataset.cols;
+                this.applyLayout(cols, buttons);
+                localStorage.setItem('esm-layout', cols);
+            });
+        });
+    }
+
+    applyLayout(cols, buttons) {
+        // Update button active state
+        buttons.forEach(b => b.classList.toggle('active', b.dataset.cols === cols));
+
+        // Update body class
+        document.body.classList.remove('layout-2', 'layout-3', 'layout-4');
+        if (cols !== '2') {
+            document.body.classList.add(`layout-${cols}`);
+        }
+
+        // Trigger chart resize after layout transition
+        requestAnimationFrame(() => {
+            for (const { chart } of this.charts.values()) {
+                chart.resize();
+            }
+        });
     }
 
     updateThemeIcon() {
