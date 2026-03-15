@@ -13,6 +13,8 @@
  </p>
 </div>
 
+![Dashboard Preview](./assets/showcase.gif)
+
 **Express Status Monitor Plus** is a lightweight, production-ready Application Performance Monitoring (APM) tool. It provides a beautiful, modern dashboard to track your server's health in real-time.
 
 As an independent, heavily upgraded fork of the original `express-status-monitor`, this **Plus** version introduces critical enterprise features like persistent metrics across restarts, P50/P95/P99 percentiles, dark mode, and upstream health checks—all without the steep cost of commercial APMs like Datadog or New Relic.
